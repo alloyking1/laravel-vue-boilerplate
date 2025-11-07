@@ -3,6 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import { defineConfig } from 'vite';
+import path from 'path';
 
 export default defineConfig({
     plugins: [
@@ -24,4 +25,20 @@ export default defineConfig({
             },
         }),
     ],
+
+    // 👇 This is what enables module paths
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'resources/js'),
+            '@modules': path.resolve(__dirname, 'Modules'),
+        },
+    },
+
+    // 👇 Make sure Vite watches the Modules directory too
+    server: {
+        watch: {
+            usePolling: true,
+            ignored: ['!**/Modules/**'],
+        },
+    },
 });

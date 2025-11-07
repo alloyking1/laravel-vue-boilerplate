@@ -46,9 +46,10 @@ const hasBusiness = () => {
                 <div v-if="!hasBusiness()">
                     <CreateBusiness />
                 </div>
-                <!-- <div v-else>
-                    <BusinessDashboard />
-                </div> -->
+                <div v-else>
+                    This is your biz
+                    <!-- <BusinessDashboard /> -->
+                </div>
             </div>
         </div>
     </AppLayout>

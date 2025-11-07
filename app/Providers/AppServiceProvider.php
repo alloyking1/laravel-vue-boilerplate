@@ -23,3 +23,4 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Database\Eloquent\Model::preventLazyLoading(! app()->isProduction());
     }
 }
+

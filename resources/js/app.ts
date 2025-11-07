@@ -8,13 +8,19 @@ import { initializeTheme } from './composables/useAppearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+const corePages = import.meta.glob<DefineComponent>('./pages/**/*.vue');
+const modulePages = import.meta.glob<DefineComponent>('@modules/**/resources/js/Pages/**/*.vue');
+const pages = { ...corePages, ...modulePages };
+
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) =>
-        resolvePageComponent(
-            `./pages/${name}.vue`,
-            import.meta.glob<DefineComponent>('./pages/**/*.vue'),
-        ),
+    resolve: (name) => {
+        const inertiaPath = `./pages/${name}.vue`;
+        const modulePath = Object.keys(modulePages).find((path) => path.endsWith(`/Pages/${name}.vue`));
+        const candidatePaths = modulePath ? [inertiaPath, modulePath] : [inertiaPath];
+
+        return resolvePageComponent(candidatePaths, pages);
+    },
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
             .use(plugin)
