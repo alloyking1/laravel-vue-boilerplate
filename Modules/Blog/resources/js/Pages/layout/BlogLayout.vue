@@ -15,10 +15,17 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <div class="bg-black">
-        <!-- <AppLayout :breadcrumbs="breadcrumbs"> -->
-        <Toaster />
-        <slot />
-        <!-- </AppLayout> -->
+    <div class="bg-gray-100 h-screen">
+        <div class="max-w-7xl mx-auto">
+            <div class="p-8 md:flex md:justify-between md:items-center grid">
+                <h1 class="text-4xl font-bold">
+                    {{ $page.props.name ?? 'Blog' }} Blog
+                </h1>
+                <p class="text-gray-500">Stories, insights, and advice that will transform how you design and build for the web.</p>
+            </div>
+            <hr class="">
+            <Toaster />
+            <slot />
+        </div>
     </div>
 </template>
