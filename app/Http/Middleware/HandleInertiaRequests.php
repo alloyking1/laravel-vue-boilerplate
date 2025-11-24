@@ -41,6 +41,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => env('APP_NAME'),
+            'tiny_api_key' => env('TINY_API_KEY'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
