@@ -10,5 +10,7 @@ use Modules\Blog\Http\Controllers\PostTagController;
 
     Route::prefix('tag')->group(function () {
         Route::get('/create', [PostTagController::class, 'create'])->name('tag.create');
+        Route::post('/store', [PostTagController::class, 'store'])->name('tag.store');
+        Route::post('/delete/{id}', [PostTagController::class, 'delete'])->name('tag.delete');
     });
 // });

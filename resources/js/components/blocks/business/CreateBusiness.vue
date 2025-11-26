@@ -43,9 +43,6 @@ const createBusiness = () => {
         }
     })
 }
-
-
-
 </script>
 
 <template>

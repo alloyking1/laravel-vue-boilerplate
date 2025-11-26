@@ -36,7 +36,7 @@ const setPostSlog = () => {
     <div class="">
         <BlogLayout>
             <div class="max-w-7xl mx-auto">
-                <div class="p-8">
+                <div class="py-8">
                     <h1 class="text-2xl font-bold">Create Blog</h1>
                 </div>
                 <div class="">

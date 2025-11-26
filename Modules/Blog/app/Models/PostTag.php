@@ -13,7 +13,7 @@ class PostTag extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [];
+    protected $fillable = ['title','description'];
 
     // protected static function newFactory(): PostTagFactory
     // {

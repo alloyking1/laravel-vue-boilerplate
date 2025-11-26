@@ -15,9 +15,9 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <div class="">
+    <div class="px-8">
         <div class="max-w-7xl mx-auto pb-8">
-            <div class="p-8 md:flex md:justify-between md:items-center grid">
+            <div class="py-8 md:flex md:justify-between md:items-center grid">
                 <h1 class="text-4xl font-bold">
                     {{ $page.props.name ?? 'Blog' }} Blog
                 </h1>
