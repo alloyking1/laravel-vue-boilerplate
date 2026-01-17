@@ -11,9 +11,6 @@ use Modules\Blog\Services\PostTagService;
 
 class PostTagController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function create(Request $request, PostTagService $tagService)
     {
         $tags = $tagService->allTags();
@@ -27,16 +24,14 @@ class PostTagController extends Controller
         $validated = $request->validate([
             'title' => 'string|required|max:255'
         ]);
-
-        $result = $tagService->updateOrCreate($request);
+        $result = $tagService->updateOrCreate($request, $request->id ?? null);
         return redirect()->back()->with('success', 'Tag created successfully');
     }
 
     public function delete($id, PostTagService $tagService)
     {
         $result = $tagService->delete($id);
-        return redirect()->back()->with('success', 'Tag Deleted successfully');
+        return redirect()->back()->with('success', 'Tag deleted successfully');
     }
-
 
 }

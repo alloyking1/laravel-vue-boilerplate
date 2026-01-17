@@ -7,7 +7,7 @@ import { Button } from '../../../../../../resources/js/components/ui/button';
 import { Spinner } from '../../../../../../resources/js/components/ui/spinner';
 import InputError from '../../../../../../resources/js/components/InputError.vue';
 import { toast } from 'vue-sonner'
-import PostTagController from '../../../../../../resources/js/actions/Modules/Blog/Http/Controllers/PostTagController';
+import PostCategoryController from '../../../../../../resources/js/actions/Modules/Blog/Http/Controllers/PostCategoryController';
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow, } from '../../../../../../resources/js/components/ui/table';
 import { onMounted } from 'vue';
 import { Pencil, Trash } from 'lucide-vue-next';
@@ -27,19 +27,19 @@ import {
 
 const isDrawerOpen = ref(false);
 const props = defineProps({
-    tags: {
+    category: {
         type: String,
     },
 });
 
-const tag = useForm({
+const category = useForm({
     title: '',
     id: '',
 });
 const page = usePage();
 
 const submit = () => {
-    tag.post(PostTagController.store(), {
+    category.post(PostCategoryController.store(), {
         onSuccess: () => {
             const success = page.props.flash?.success
             if (success) {
@@ -50,15 +50,15 @@ const submit = () => {
                         onClick: () => { },
                     }
                 });
-                tag.reset();
+                category.reset();
                 isDrawerOpen.value = false
             }
         }
     });
 }
 
-const deleteTag = (id) => {
-    router.post(PostTagController.delete(id), {
+const deleteCategory = (id) => {
+    router.post(PostCategoryController.delete(id), {
         onSuccess: () => {
             const success = page.props.flash?.success
             if (success) {
@@ -74,10 +74,10 @@ const deleteTag = (id) => {
     });
 }
 
-const editTag = (id, title) => {
+const editCategory = (id, title) => {
     isDrawerOpen.value = !isDrawerOpen.value;
-    tag.title = title
-    tag.id = id
+    category.title = title
+    category.id = id
 }
 </script>
 
@@ -97,8 +97,8 @@ const editTag = (id, title) => {
                     <DrawerContent>
                         <div class="mx-auto w-full max-w-xl p-4">
                             <DrawerHeader class="p-0 pb-4 py-2">
-                                <DrawerTitle>Create a new Tag</DrawerTitle>
-                                <DrawerDescription>Use the form below to create a new tag for blog posts.
+                                <DrawerTitle>Create a new category</DrawerTitle>
+                                <DrawerDescription>Use the form below to create a new category for blog posts.
                                 </DrawerDescription>
                             </DrawerHeader>
 
@@ -106,8 +106,9 @@ const editTag = (id, title) => {
                                 <form action="" @submit.prevent="submit">
                                     <div class="flex gap-2">
                                         <div class="w-full">
-                                            <Input id="title" type="text" v-model="tag.title" placeholder="Tag title" />
-                                            <InputError :message="tag.errors.title" />
+                                            <Input id="title" type="text" v-model="category.title"
+                                                placeholder="Tag title" />
+                                            <InputError :message="category.errors.title" />
                                         </div>
 
                                     </div>
@@ -136,33 +137,26 @@ const editTag = (id, title) => {
             <div class="mt-12">
                 <div>
                     <div class="py-8">
-                        <h1 class="text-2xl font-bold">Tags List</h1>
+                        <h1 class="text-2xl font-bold">Category List</h1>
                         <p>
-                            A list of tags already created
+                            A list of category already created
                         </p>
                     </div>
                 </div>
 
                 <Table>
-                    <TableCaption>A list of tags</TableCaption>
-                    <TableHeader>
-                        <!-- <TableRow>
-                            <TableHead class="">
-                                Tag Name
-                            </TableHead>
-                            <TableHead class="">Modify</TableHead>
-                        </TableRow> -->
-                    </TableHeader>
+                    <TableCaption>A list of category</TableCaption>
                     <TableBody class="">
-                        <TableRow v-for="tag in props.tags" :key="tag.id" class="">
+                        <TableRow v-for="category in props.category" :key="category.id" class="">
                             <div class="flex justify-between">
                                 <TableCell class=" font-medium">
-                                    {{ tag.title }}
+                                    {{ category.title }}
                                 </TableCell>
 
                                 <TableCell class="text-right">
                                     <div class="flex">
-                                        <Button size="sm" variant="outline" @click="editTag(tag.id, tag.title)"
+                                        <Button size="sm" variant="outline"
+                                            @click="editCategory(category.id, category.title)"
                                             class="hover:cursor-pointer rounded-full shadow">
                                             <Pencil class="" />
                                         </Button>
@@ -180,13 +174,13 @@ const editTag = (id, title) => {
                                                         <AlertDialogDescription>
                                                             This action cannot be undone. This will permanently delete
                                                             this
-                                                            tag
+                                                            category
                                                             and remove any record of it from your blog.
                                                         </AlertDialogDescription>
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                        <AlertDialogAction @click="deleteTag(tag.id)">Continue
+                                                        <AlertDialogAction @click="deleteCategory(category.id)">Continue
                                                         </AlertDialogAction>
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
