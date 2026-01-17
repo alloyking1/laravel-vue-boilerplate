@@ -11,9 +11,6 @@ use Modules\Blog\Services\PostTagService;
 
 class PostTagController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function create(Request $request, PostTagService $tagService)
     {
         $tags = $tagService->allTags();
@@ -36,6 +33,5 @@ class PostTagController extends Controller
         $result = $tagService->delete($id);
         return redirect()->back()->with('success', 'Tag deleted successfully');
     }
-
 
 }

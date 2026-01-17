@@ -4,53 +4,32 @@ namespace Modules\Blog\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Blog\Services\PostCategoryService;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class PostCategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function create(Request $request, PostCategoryService $Service)
     {
-        return view('blog::index');
+        $category = $Service->allCategories();
+        return Inertia::render('category/createCategory',[
+            'category' => $category
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request, PostCategoryService $Service)
     {
-        return view('blog::create');
+        $validated = $request->validate([
+            'title' => 'string|required|max:255'
+        ]);
+        $result = $Service->updateOrCreate($request, $request->id ?? null);
+        return redirect()->back()->with('success', 'Category created successfully');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function delete($id, PostCategoryService $Service)
     {
-        return view('blog::show');
+        $result = $Service->delete($id);
+        return redirect()->back()->with('success', 'Tag deleted successfully');
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('blog::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
 }

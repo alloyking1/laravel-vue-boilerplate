@@ -13,10 +13,9 @@ class PostCategory extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [];
+    protected $fillable = ['title','description'];
 
-    // protected static function newFactory(): PostCategoryFactory
-    // {
-    //     // return PostCategoryFactory::new();
+    // public function post(){
+    //     return $this->hasMany(Post::class);
     // }
 }
