@@ -9,8 +9,16 @@ import { computed } from 'vue';
 import { Button } from '../../../../../../resources/js/components/ui/button';
 import { Spinner } from '../../../../../../resources/js/components/ui/spinner';
 
-const page = usePage();
-const apiKey = computed(() => page.props.tiny_api_key);
+// const page = usePage();
+// const apiKey = computed(() => page.props.tiny_api_key);
+
+const props = defineProps({
+    categories: {
+        type: String,
+    },
+    tags: { type: String }
+});
+
 const blogPost = useForm({
     title: '',
     slog: '',
@@ -29,6 +37,7 @@ const blogPost = useForm({
 const setPostSlog = () => {
     blogPost.slog = blogPost.title.replaceAll(' ', '-');
 }
+
 
 </script>
 
@@ -62,15 +71,16 @@ const setPostSlog = () => {
                                 <InputError :message="blogPost.min_to_read" />
                             </div>
                             <div>
+
                                 <select id="team_size" v-model="blogPost.category" class="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm
                         focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]
                         dark:aria-invalid:ring-destructive/20 aria-invalid:border-destructive">
                                     <option value="" class="tex-xs text-muted-foreground" selected disabled>
                                         category
                                     </option>
-                                    <option value="0-10">0-10</option>
-                                    <option value="10-50">10-50</option>
-                                    <option value="50-100">50-100</option>
+                                    <option v-for="category in props.categories" :value="category.id">
+                                        {{ category.title }}
+                                    </option>
                                 </select>
                                 <InputError :message="blogPost.errors.category" />
                             </div>
@@ -81,9 +91,7 @@ const setPostSlog = () => {
                                     <option value="" class="tex-xs text-muted-foreground" selected disabled>
                                         Tag
                                     </option>
-                                    <option value="0-10">0-10</option>
-                                    <option value="10-50">10-50</option>
-                                    <option value="50-100">50-100</option>
+                                    <option v-for="tag in props.tags" value="tag.id">{{ tag.title }}</option>
                                 </select>
                                 <InputError :message="blogPost.errors.tag" />
                             </div>

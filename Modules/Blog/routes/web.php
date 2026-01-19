@@ -1,13 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Blog\Http\Controllers\BlogController;
+use Modules\Blog\Http\Controllers\PostController;
 use Modules\Blog\Http\Controllers\PostTagController;
 use Modules\Blog\Http\Controllers\PostCategoryController;
 
 // Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('blog', [BlogController::class, 'index'])->name('blog.index');
-    Route::get('blog/create', [BlogController::class, 'create'])->name('blog.create');
+    Route::get('blog', [PostController::class, 'index'])->name('blog.index');
+    Route::get('blog/create', [PostController::class, 'create'])->name('blog.create');
 
     Route::prefix('blog/tag')->group(function () {
         Route::get('/create', [PostTagController::class, 'create'])->name('tag.create');
