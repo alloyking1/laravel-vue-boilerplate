@@ -8,25 +8,34 @@ import { useForm, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue';
 import { Button } from '../../../../../../resources/js/components/ui/button';
 import { Spinner } from '../../../../../../resources/js/components/ui/spinner';
-
-// const page = usePage();
-// const apiKey = computed(() => page.props.tiny_api_key);
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from '../../../../../../resources/js/components/ui/select'
+import PostController from '../../../../../../resources/js/actions/Modules/Blog/Http/Controllers/PostController';
+import InputError from '../../../../../../resources/js/components/InputError.vue';
+import Editor from '../../../../../../resources/js/components/TinyMceEditor.vue';
+import { Edit } from 'lucide-vue-next';
 
 const props = defineProps({
-    categories: {
-        type: String,
-    },
-    tags: { type: String }
+    categories: { type: String },
+    tags: { type: String },
+    postGradeEnum: { type: String },
 });
 
 const blogPost = useForm({
     title: '',
-    slog: '',
+    slug: '',
     excerpt: '',
     min_to_read: '',
     category: '',
-    tag: '',
-    is_published: '',
+    tag: [] as number[],
+    is_published: false,
     meta_description: '',
     meta_keywords: '',
     meta_robots: '',
@@ -34,8 +43,16 @@ const blogPost = useForm({
     body: '',
 })
 
-const setPostSlog = () => {
-    blogPost.slog = blogPost.title.replaceAll(' ', '-');
+const setPostSlug = () => {
+    blogPost.slug = blogPost.title.toLowerCase().replaceAll(' ', '-');
+}
+
+const submit = () => {
+    blogPost.post(PostController.store(), {
+        onSuccess: () => {
+            blogPost.reset();
+        }
+    });
 }
 
 
@@ -52,23 +69,23 @@ const setPostSlog = () => {
                     <form action="">
                         <div class="grid grid-cols-2 gap-2">
                             <div class="">
-                                <Input @keyup="setPostSlog" id="title" type="text" v-model="blogPost.title"
+                                <Input @keyup="setPostSlug" id="title" type="text" v-model="blogPost.title"
                                     placeholder="Blog post title" />
-                                <InputError :message="blogPost.title" />
+                                <InputError :message="blogPost.errors.title" />
                             </div>
 
                             <div class="">
-                                <Input id="slog" type="text" v-model="blogPost.slog" placeholder="Blog post slog"
+                                <Input id="slug" type="text" v-model="blogPost.slug" placeholder="Blog post slug"
                                     disabled />
-                                <InputError :message="blogPost.slog" />
+                                <InputError :message="blogPost.errors.slug" />
                             </div>
                         </div>
 
                         <div class="grid grid-cols-4 gap-4 mt-2">
                             <div>
-                                <Input @keyup="setPostSlog" id="min_to_read" type="text" v-model="blogPost.min_to_read"
+                                <Input @keyup="setPostSlug" id="min_to_read" type="text" v-model="blogPost.min_to_read"
                                     placeholder="Minutes to read" />
-                                <InputError :message="blogPost.min_to_read" />
+                                <InputError :message="blogPost.errors.min_to_read" />
                             </div>
                             <div>
 
@@ -76,7 +93,7 @@ const setPostSlog = () => {
                         focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]
                         dark:aria-invalid:ring-destructive/20 aria-invalid:border-destructive">
                                     <option value="" class="tex-xs text-muted-foreground" selected disabled>
-                                        category
+                                        Category
                                     </option>
                                     <option v-for="category in props.categories" :value="category.id">
                                         {{ category.title }}
@@ -84,60 +101,69 @@ const setPostSlog = () => {
                                 </select>
                                 <InputError :message="blogPost.errors.category" />
                             </div>
+
                             <div>
-                                <select id="team_size" v-model="blogPost.tag" class="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm
-                        focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]
-                        dark:aria-invalid:ring-destructive/20 aria-invalid:border-destructive">
-                                    <option value="" class="tex-xs text-muted-foreground" selected disabled>
-                                        Tag
-                                    </option>
-                                    <option v-for="tag in props.tags" value="tag.id">{{ tag.title }}</option>
-                                </select>
+                                <Select multiple class="" v-model="blogPost.tag">
+                                    <SelectTrigger class="">
+                                        <SelectValue placeholder="Tags (Multiple select)" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectLabel>Tags</SelectLabel>
+                                            <SelectItem v-for="tag in props.tags" :value="tag.id">
+                                                {{ tag.title }}
+                                            </SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
                                 <InputError :message="blogPost.errors.tag" />
                             </div>
+
+
                             <div>
-                                <select id="team_size" v-model="blogPost.tag" class="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm
+                                <select id="grade" v-model="blogPost.grade" class="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm
                         focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]
                         dark:aria-invalid:ring-destructive/20 aria-invalid:border-destructive">
                                     <option value="" class="tex-xs text-muted-foreground" selected disabled>
                                         Grade
                                     </option>
-                                    <option value="0-10">0-10</option>
-                                    <option value="10-50">10-50</option>
-                                    <option value="50-100">50-100</option>
+                                    <option v-for="grade in props.postGradeEnum" :key="grade" :value="grade">
+                                        {{ grade }}
+                                    </option>
                                 </select>
-                                <InputError :message="blogPost.errors.tag" />
+                                <InputError :message="blogPost.errors.grade" />
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1">
                             <div class="mt-2">
-                                <Textarea placeholder="Blog excerpt..." />
-                                <InputError :message="blogPost.excerpt" />
+                                <Textarea v-model="blogPost.excerpt" placeholder="Blog excerpt..." />
+                                <InputError :message="blogPost.errors.excerpt" />
                             </div>
                         </div>
 
 
                         <div class="grid grid-cols-1 mt-2">
-                            <Textarea placeholder="Blog excerpt..." />
-                            <InputError :message="blogPost.excerpt" />
+                            <!-- <Textarea v-model="blogPost.body" placeholder="Blog body..." /> -->
+                            <Editor v-model="blogPost.body" />
+                            <InputError :message="blogPost.errors.body" />
                         </div>
 
                         <div class="grid grid-cols-3 gap-4 mt-2">
                             <div>
                                 <Input id="meta_description" type="text" v-model="blogPost.meta_description"
                                     placeholder="Meta description" />
-                                <InputError :message="blogPost.meta_description" />
+                                <InputError :message="blogPost.errors.meta_description" />
                             </div>
                             <div>
                                 <Input id="meta_keywords" type="text" v-model="blogPost.meta_keywords"
                                     placeholder="Meta keywords" />
-                                <InputError :message="blogPost.meta_keywords" />
+                                <InputError :message="blogPost.errors.meta_keywords" />
                             </div>
                             <div>
                                 <Input id="meta_robots" type="text" v-model="blogPost.meta_robots"
                                     placeholder="Meta Robots" />
-                                <InputError :message="blogPost.meta_robots" />
+                                <InputError :message="blogPost.errors.meta_robots" />
                             </div>
                         </div>
 
@@ -150,8 +176,9 @@ const setPostSlog = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <Button size="sm" variant="outline" disabled>
-                                        <Spinner class="animate-spin" />
+                                    <Button @click="submit" :disabled="blogPost.processing" size="sm" variant="outline"
+                                        type="button">
+                                        <Spinner v-if="blogPost.processing" class="animate-spin mr-2" />
                                         Submit
                                     </Button>
                                 </div>

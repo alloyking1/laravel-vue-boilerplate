@@ -14,9 +14,21 @@ class Post extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [];
+    protected $casts = [
+        'meta_robots' => 'array',
+        'meta_keywords' => 'array',
+        'meta_description' => 'array',
+    ];
 
-    // protected static function newFactory(): PostFactory
-    // {
-    //     // return PostFactory::new();
-    // }
+   public function category()
+   {
+       return $this->belongsTo(PostCategory::class, 'category_id');
+   }
+
+   public function tag()
+   {
+       return $this->belongsToMany(PostTag::class, 'post_tag', 'post_id', 'tag_id');
+   }
+
+
 }

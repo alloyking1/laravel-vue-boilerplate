@@ -14,16 +14,16 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            $table->foreignId('tag_id')->constrained('tags')->onDelete('cascade');
+            // $table->foreignId('tag_id')->constrained('tags')->onDelete('cascade');
             $table->string('title');
             $table->text('content');
             $table->string('slug');
             $table->string('minute_read');
-            $table->string('grade')->nullable(); // e.g., reading grade level
+            $table->string('grade'); // e.g., reading grade level
             $table->string('excerpt');
-            $table->string('meta_description')->nullable();
-            $table->string('meta_keyword')->nullable();
-            $table->string('meta_robot')->nullable();
+            $table->json('meta_description')->nullable();
+            $table->json('meta_keyword')->nullable();
+            $table->json('meta_robot')->nullable();
             $table->boolean('published')->default(false);
             $table->timestamps();
         });
