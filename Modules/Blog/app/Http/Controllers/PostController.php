@@ -9,6 +9,8 @@ use Inertia\Response;
 use Modules\Blog\Services\PostService;
 use Modules\Blog\Models\PostCategory;
 use Modules\Blog\Models\PostTag;
+use Modules\Blog\Enums\PostGradeEnum;
+use Modules\Blog\Http\Requests\CreatePostRequest;
 
 
 class PostController extends Controller
@@ -19,25 +21,23 @@ class PostController extends Controller
         return Inertia::render('blog/index');
     }
 
-    public function create(Request $request, PostService $Service)
+    public function create(PostService $Service)
     {
         return Inertia::render('blog/createBlog',[
             'categories' =>  PostCategory::all(),
-            'tags' =>  PostTag::all()
+            'tags' =>  PostTag::all(),
+            'postGradeEnum' =>  PostGradeEnum::cases(),
         ]);
         
     }
 
-    // public function store(Request $request, PostCategoryService $Service)
-    // {
-    //     $validated = $request->validate([
-    //         'title' => 'string|required|max:255'
-    //     ]);
-    //     $result = $Service->updateOrCreate($request, $request->id ?? null);
-    //     return redirect()->back()->with('success', 'Category created successfully');
-    // }
+    public function store(CreatePostRequest $request, PostService $Service)
+    {
+        $result = $Service->updateOrCreate($request, $request->id ?? null);
+        return redirect()->back()->with('success', 'Post created successfully');
+    }
 
-    // public function delete($id, PostCategoryService $Service)
+    // public function delete($id, PostService $Service)
     // {
     //     $result = $Service->delete($id);
     //     return redirect()->back()->with('success', 'Tag deleted successfully');

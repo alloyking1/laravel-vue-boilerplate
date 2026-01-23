@@ -8,6 +8,7 @@ use Modules\Blog\Http\Controllers\PostCategoryController;
 // Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('blog', [PostController::class, 'index'])->name('blog.index');
     Route::get('blog/create', [PostController::class, 'create'])->name('blog.create');
+    Route::post('blog/store', [PostController::class, 'store'])->name('blog.store');
 
     Route::prefix('blog/tag')->group(function () {
         Route::get('/create', [PostTagController::class, 'create'])->name('tag.create');
