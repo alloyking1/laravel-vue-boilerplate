@@ -13,10 +13,10 @@ class Post extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [];
+    protected $guarded = [];
     protected $casts = [
-        'meta_robots' => 'array',
-        'meta_keywords' => 'array',
+        'meta_robot' => 'array',
+        'meta_keyword' => 'array',
         'meta_description' => 'array',
     ];
 

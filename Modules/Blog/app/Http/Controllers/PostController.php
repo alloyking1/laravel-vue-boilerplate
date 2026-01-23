@@ -10,6 +10,7 @@ use Modules\Blog\Services\PostService;
 use Modules\Blog\Models\PostCategory;
 use Modules\Blog\Models\PostTag;
 use Modules\Blog\Enums\PostGradeEnum;
+use Modules\Blog\Http\Requests\CreatePostRequest;
 
 
 class PostController extends Controller
@@ -30,23 +31,8 @@ class PostController extends Controller
         
     }
 
-    public function store(Request $request, PostService $Service)
+    public function store(CreatePostRequest $request, PostService $Service)
     {
-        dd($request->all());   
-        $validated = $request->validate([
-            'title' => 'string|required|max:255',
-            'slug' => 'string|required|max:255',
-            'excerpt' => 'string|required|max:255',
-            'min_to_read' => 'string|required|max:255',
-            'category' => 'integer|required|max:255',
-            'tag' => 'array|required',
-            'is_published' => 'boolean|required',
-            'meta_description' => 'string|required|max:255',
-            'meta_keywords' => 'string|required|max:255',
-            'meta_robots' => 'string|required|max:255',
-            'grade' => 'string|required|max:255',
-            'body' => 'string|required'
-        ]);
         $result = $Service->updateOrCreate($request, $request->id ?? null);
         return redirect()->back()->with('success', 'Post created successfully');
     }

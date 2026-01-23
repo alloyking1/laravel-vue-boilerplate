@@ -21,7 +21,9 @@ import PostController from '../../../../../../resources/js/actions/Modules/Blog/
 import InputError from '../../../../../../resources/js/components/InputError.vue';
 import Editor from '../../../../../../resources/js/components/TinyMceEditor.vue';
 import { Edit } from 'lucide-vue-next';
+import { toast } from 'vue-sonner'
 
+const page = usePage();
 const props = defineProps({
     categories: { type: String },
     tags: { type: String },
@@ -37,8 +39,8 @@ const blogPost = useForm({
     tag: [] as number[],
     is_published: false,
     meta_description: '',
-    meta_keywords: '',
-    meta_robots: '',
+    meta_keyword: '',
+    meta_robot: '',
     grade: '',
     body: '',
 })
@@ -48,9 +50,20 @@ const setPostSlug = () => {
 }
 
 const submit = () => {
+    console.log(blogPost);
     blogPost.post(PostController.store(), {
         onSuccess: () => {
-            blogPost.reset();
+            const success = page.props.flash?.success
+            if (success) {
+                toast('Success', {
+                    description: success,
+                    action: {
+                        label: 'Continue',
+                        onClick: () => { },
+                    }
+                });
+                blogPost.reset();
+            }
         }
     });
 }
@@ -83,7 +96,7 @@ const submit = () => {
 
                         <div class="grid grid-cols-4 gap-4 mt-2">
                             <div>
-                                <Input @keyup="setPostSlug" id="min_to_read" type="text" v-model="blogPost.min_to_read"
+                                <Input id="min_to_read" type="number" v-model="blogPost.min_to_read"
                                     placeholder="Minutes to read" />
                                 <InputError :message="blogPost.errors.min_to_read" />
                             </div>
@@ -144,8 +157,7 @@ const submit = () => {
 
 
                         <div class="grid grid-cols-1 mt-2">
-                            <!-- <Textarea v-model="blogPost.body" placeholder="Blog body..." /> -->
-                            <Editor v-model="blogPost.body" />
+                            <Editor v-model:body="blogPost.body" />
                             <InputError :message="blogPost.errors.body" />
                         </div>
 
@@ -156,14 +168,14 @@ const submit = () => {
                                 <InputError :message="blogPost.errors.meta_description" />
                             </div>
                             <div>
-                                <Input id="meta_keywords" type="text" v-model="blogPost.meta_keywords"
+                                <Input id="meta_keywords" type="text" v-model="blogPost.meta_keyword"
                                     placeholder="Meta keywords" />
-                                <InputError :message="blogPost.errors.meta_keywords" />
+                                <InputError :message="blogPost.errors.meta_keyword" />
                             </div>
                             <div>
-                                <Input id="meta_robots" type="text" v-model="blogPost.meta_robots"
+                                <Input id="meta_robots" type="text" v-model="blogPost.meta_robot"
                                     placeholder="Meta Robots" />
-                                <InputError :message="blogPost.errors.meta_robots" />
+                                <InputError :message="blogPost.errors.meta_robot" />
                             </div>
                         </div>
 

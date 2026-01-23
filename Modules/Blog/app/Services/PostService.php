@@ -6,25 +6,27 @@ use Modules\Blog\Models\Post;
 
 class PostService
 {
-    // Service methods for Post management would go here
+    //modify to use DTO later
     public function updateOrCreate($payload, $id = null)
     {
-        return Post::updateOrCreate([
+        $createPost = Post::updateOrCreate([
             'id' => $id
         ], [
             'title' => $payload->title,
             'slug' => $payload->slug,
             'excerpt' => $payload->excerpt,
-            'min_to_read' => $payload->min_to_read,
-            'category' => $payload->category,
-            // 'tag' => $payload->tag,
-            'is_published' => $payload->is_published,
+            'minute_read' => $payload->min_to_read,
+            'category_id' => $payload->category,
+            'published' => $payload->is_published,
             'meta_description' => $payload->meta_description,
-            'meta_keywords' => $payload->meta_keywords,
-            'meta_robots' => $payload->meta_robots,
+            'meta_keyword' => $payload->meta_keyword,
+            'meta_robot' => $payload->meta_robot,
             'grade' => $payload->grade,
-            'body' => $payload->body
+            'content' => $payload->body
         ]);
+
+        $createPost->tag()->sync($payload->tag);
+        return $createPost;
     }
 
     // public function allPost(){
@@ -35,8 +37,4 @@ class PostService
     //     return PostTag::find($id)->delete();
     // }
 
-
-    public function addTags($payload){
-
-    }
 }       
