@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { login, register } from '@/routes';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import GuestLayout from '@/layouts/GuestLayout.vue';
 import LandingHeader from '@/Components/LandingHeader.vue';
 import ComingSoonSection from '@/Components/ComingSoonSection.vue';
+import Footer from '@/Components/Footer.vue';
+
+const page = usePage();
+const appName = page.props.name as string;
 </script>
 
 <template>
     <GuestLayout>
         <div class="min-h-screen bg-white text-black">
 
-            <Head title="Payzora - Finance Hub for Ecommerce" />
+            <Head :title="`${appName} - Finance Hub for Ecommerce`" />
 
             <LandingHeader />
 
@@ -33,7 +37,8 @@ import ComingSoonSection from '@/Components/ComingSoonSection.vue';
                                 </span>
                             </h1>
                             <p class="text-xl leading-relaxed text-black/70">
-                                Payzora is a streamlined finance hub for ecommerce founders who want clarity without
+                                {{ appName }} is a streamlined finance hub for ecommerce founders who want clarity
+                                without
                                 complexity.
                             </p>
                             <div class="flex flex-wrap gap-4 pt-4">
@@ -313,18 +318,7 @@ import ComingSoonSection from '@/Components/ComingSoonSection.vue';
 
                 <ComingSoonSection />
 
-                <footer class="mx-auto w-full max-w-6xl border-t border-black/10 px-6 py-12">
-                    <div class="flex flex-wrap items-center justify-between gap-6">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="flex h-8 w-8 items-center justify-center rounded-xl border border-black bg-black text-sm text-white">
-                                P
-                            </div>
-                            <span class="font-semibold">Payzora</span>
-                        </div>
-                        <p class="text-sm text-black/50">&copy; 2026 Payzora. Finance clarity for ecommerce.</p>
-                    </div>
-                </footer>
+                <Footer />
             </main>
         </div>
     </GuestLayout>

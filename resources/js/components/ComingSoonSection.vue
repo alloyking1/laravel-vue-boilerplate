@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import { toast } from 'vue-sonner';
 import InputError from '@/components/InputError.vue';
+
+const page = usePage();
+const appName = page.props.name as string;
 
 const form = useForm({
     name: '',
@@ -40,7 +43,8 @@ const submit = () => {
                         <span class="h-2 w-2 animate-pulse rounded-full bg-white"></span>
                         <p class="text-xs font-semibold uppercase tracking-widest text-white">Waiting list</p>
                     </div>
-                    <h2 class="mt-6 text-4xl font-bold leading-tight lg:text-5xl">Be first to experience Payzora.</h2>
+                    <h2 class="mt-6 text-4xl font-bold leading-tight lg:text-5xl">Be first to experience {{ appName }}.
+                    </h2>
                     <p class="mt-4 text-lg leading-relaxed text-black/70">
                         Share what you need most and help us shape the product for ecommerce founders.
                     </p>
