@@ -10,7 +10,7 @@ const props = defineProps<Props>();
 const classes = computed(() => {
     switch (props.status) {
         case 'paid':
-            return 'bg-black text-white';
+            return 'bg-emerald-500 text-white';
         case 'overdue':
             return 'bg-red-600 text-white';
         case 'sent':
