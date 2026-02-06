@@ -1,10 +1,22 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import AppLayout from '@/layouts/AppLayout.vue';
 import StatsCard from '@modules/Invoice/resources/js/Components/StatsCard.vue';
 import InvoiceTable from '@modules/Invoice/resources/js/Components/InvoiceTable.vue';
 import InvoiceDrawerForm from '@modules/Invoice/resources/js/Components/InvoiceDrawerForm.vue';
+import InvoiceEditDrawerForm from '@modules/Invoice/resources/js/Components/InvoiceEditDrawerForm.vue';
 
 interface Stats {
     totalRevenue: number;
@@ -16,6 +28,10 @@ interface Stats {
 interface ClientFolder {
     id: number;
     name: string;
+    email?: string | null;
+    phone?: string | null;
+    address?: string | null;
+    notes?: string | null;
     invoiceCount: number;
 }
 
@@ -23,6 +39,15 @@ interface Client {
     id: number;
     name: string;
     email?: string | null;
+}
+
+interface InvoiceItem {
+    id: number;
+    description: string;
+    quantity: number | string;
+    rate: number | string;
+    amount: number | string;
+    position?: number | null;
 }
 
 interface InvoiceRow {
@@ -35,14 +60,77 @@ interface InvoiceRow {
     client?: Client | null;
 }
 
+interface InvoiceFull {
+    id: number;
+    invoice_client_id?: number | null;
+    invoice_number: string;
+    status: string;
+    issue_date?: string | null;
+    due_date?: string | null;
+    currency?: string | null;
+    notes?: string | null;
+    subtotal?: number | string;
+    tax?: number | string;
+    total?: number | string;
+    client?: ClientFolder | null;
+    items: InvoiceItem[];
+}
+
 interface Props {
-    stats: Stats;
     invoices: InvoiceRow[];
     clients: ClientFolder[];
+    stats: Stats;
 }
 
 const props = defineProps<Props>();
 const selectedClientId = ref<number | null>(null);
+const editDrawerOpen = ref(false);
+const editingInvoice = ref<InvoiceFull | null>(null);
+const isLoadingInvoice = ref(false);
+const deleteDialogOpen = ref(false);
+const deleteInvoiceId = ref<number | null>(null);
+
+const handleEditInvoice = async (invoiceId: number) => {
+    isLoadingInvoice.value = true;
+    try {
+        const response = await fetch(`/invoices/${invoiceId}/api`, {
+            headers: {
+                'Accept': 'application/json',
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            editingInvoice.value = data.invoice as InvoiceFull;
+            editDrawerOpen.value = true;
+        } else {
+            console.error('Failed to fetch invoice:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Failed to fetch invoice:', error);
+    } finally {
+        isLoadingInvoice.value = false;
+    }
+};
+
+const handleDeleteInvoice = (invoiceId: number) => {
+    deleteInvoiceId.value = invoiceId;
+    deleteDialogOpen.value = true;
+};
+
+const confirmDeleteInvoice = () => {
+    if (!deleteInvoiceId.value) return;
+
+    router.delete(`/invoices/${deleteInvoiceId.value}`, {
+        preserveScroll: true,
+        onSuccess: () => {
+            toast.success('Invoice deleted');
+            deleteDialogOpen.value = false;
+            deleteInvoiceId.value = null;
+        },
+        onError: () => toast.error('Failed to delete invoice'),
+    });
+};
 
 const filteredInvoices = computed(() => {
     if (!selectedClientId.value) return props.invoices;
@@ -123,9 +211,28 @@ const formatCurrency = (value: number) => {
                         </div>
                         <span class="text-sm text-black/50">{{ filteredInvoices.length }} invoice(s)</span>
                     </div>
-                    <InvoiceTable :invoices="filteredInvoices" :format-currency="formatCurrency" />
+                    <InvoiceTable :invoices="filteredInvoices" :format-currency="formatCurrency"
+                        @edit="handleEditInvoice" @delete="handleDeleteInvoice" />
                 </div>
             </div>
         </div>
+        <InvoiceEditDrawerForm v-if="editingInvoice" :is-open="editDrawerOpen" :invoice="editingInvoice"
+            :clients="props.clients" @update:open="(open) => editDrawerOpen = open" />
+        <AlertDialog v-model:open="deleteDialogOpen">
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Delete invoice?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This will move the invoice to trash. You can restore it later.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction @click="confirmDeleteInvoice" class="bg-red-600 hover:bg-red-700">
+                        Delete
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </AppLayout>
 </template>
