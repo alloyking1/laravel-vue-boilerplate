@@ -6,15 +6,19 @@ use App\Http\Controllers\Controller;
 use Inertia\Inertia;
 use Modules\Invoice\Models\Invoice;
 use Modules\Invoice\Models\InvoiceClient;
+use Modules\Invoice\Models\InvoiceSender;
+use Modules\Invoice\Services\InvoiceService;
 
 class InvoiceDashboardController extends Controller
 {
-    public function index()
+    public function index(InvoiceService $invoiceService)
     {
         $outstandingStatuses = ['sent', 'overdue'];
+        $paidStatuses = ['paid'];
 
         $stats = [
             'totalRevenue' => (float) Invoice::sum('total'),
+            'paidRevenue' => (float) Invoice::whereIn('status', $paidStatuses)->sum('total'),
             'outstandingAmount' => (float) Invoice::whereIn('status', $outstandingStatuses)->sum('total'),
             'outstandingCount' => Invoice::whereIn('status', $outstandingStatuses)->count(),
             'invoiceCount' => Invoice::count(),
@@ -55,10 +59,26 @@ class InvoiceDashboardController extends Controller
                 ];
             });
 
+        $senders = InvoiceSender::orderBy('name')
+            ->get()
+            ->map(function (InvoiceSender $sender) {
+                return [
+                    'id' => $sender->id,
+                    'name' => $sender->name,
+                    'email' => $sender->email,
+                    'phone' => $sender->phone,
+                    'address' => $sender->address,
+                    'notes' => $sender->notes,
+                    'isDefault' => (bool) $sender->is_default,
+                ];
+            });
+
         return Inertia::render('invoice/Dashboard', [
             'stats' => $stats,
             'invoices' => $invoices,
             'clients' => $clients,
+            'senders' => $senders,
+            'nextInvoiceNumber' => $invoiceService->nextInvoiceNumber(),
         ]);
     }
 }

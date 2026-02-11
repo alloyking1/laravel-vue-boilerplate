@@ -4,6 +4,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import InvoiceDetailHeader from '@modules/Invoice/resources/js/Components/InvoiceDetailHeader.vue';
 import InvoiceClientCard from '@modules/Invoice/resources/js/Components/InvoiceClientCard.vue';
+import InvoiceSenderCard from '@modules/Invoice/resources/js/Components/InvoiceSenderCard.vue';
 import InvoiceItemsTable from '@modules/Invoice/resources/js/Components/InvoiceItemsTable.vue';
 import InvoiceSummaryCard from '@modules/Invoice/resources/js/Components/InvoiceSummaryCard.vue';
 import InvoiceStatusActions from '@modules/Invoice/resources/js/Components/InvoiceStatusActions.vue';
@@ -38,6 +39,7 @@ interface Invoice {
     tax: number | string;
     total: number | string;
     notes?: string | null;
+    sender?: InvoiceClient | null;
     client?: InvoiceClient | null;
     items: InvoiceItem[];
 }
@@ -59,7 +61,13 @@ const formatCurrency = (value: number) => {
 
 const formatDate = (value?: string | null) => {
     if (!value) return '—';
-    return new Date(value).toLocaleDateString('en-US', {
+    const raw = value.split('T')[0];
+    const parts = raw.split('-');
+    if (parts.length !== 3) return value;
+    const [year, month, day] = parts.map(Number);
+    if (!year || !month || !day) return value;
+    const date = new Date(year, month - 1, day);
+    return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -102,11 +110,12 @@ const handlePrint = () => {
 
             <div class="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
                 <div class="space-y-6">
+                    <InvoiceSenderCard :sender="props.invoice.sender" />
+                    <InvoiceClientCard :client="props.invoice.client" />
                     <InvoiceItemsTable :items="sortedItems" :format-currency="formatCurrency" />
                     <InvoiceNotesCard :notes="props.invoice.notes" />
                 </div>
                 <div class="space-y-6">
-                    <InvoiceClientCard :client="props.invoice.client" />
                     <InvoiceSummaryCard :subtotal="props.invoice.subtotal" :tax="props.invoice.tax"
                         :total="props.invoice.total" :format-currency="formatCurrency" />
                 </div>

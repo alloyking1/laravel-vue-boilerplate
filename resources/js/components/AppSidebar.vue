@@ -2,13 +2,13 @@
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
-import {Sidebar,SidebarContent,SidebarFooter,SidebarHeader,SidebarMenu,SidebarMenuButton,SidebarMenuItem} from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import TeamController from "@/actions/App/Http/Controllers/TeamController";
 import BusinessController from '@/actions/App/Http/Controllers/BusinessController';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Users, BriefcaseBusiness, Building2, ShieldHalf } from 'lucide-vue-next';
+import { BookOpen, Folder, LayoutGrid, Users, BriefcaseBusiness, Building2, ShieldHalf, FileText } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
@@ -18,7 +18,17 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Business',     
+        title: 'Invoices',
+        href: '/invoices',
+        icon: FileText,
+    },
+    {
+        title: 'Senders',
+        href: '/invoices/senders',
+        icon: Building2,
+    },
+    {
+        title: 'Business',
         href: '#',
         icon: BriefcaseBusiness,
         isDropdown: true,
@@ -59,7 +69,7 @@ const footerNavItems: NavItem[] = [
 
 <template>
     <Sidebar collapsible="icon" variant="inset">
-    <!-- <Sidebar collapsible="offcanvas" variant="floating"> -->
+        <!-- <Sidebar collapsible="offcanvas" variant="floating"> -->
         <SidebarHeader>
             <SidebarMenu>
                 <SidebarMenuItem>

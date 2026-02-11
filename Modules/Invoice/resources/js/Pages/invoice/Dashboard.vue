@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import {
     AlertDialog,
@@ -14,12 +14,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import AppLayout from '@/layouts/AppLayout.vue';
 import StatsCard from '@modules/Invoice/resources/js/Components/StatsCard.vue';
-import InvoiceTable from '@modules/Invoice/resources/js/Components/InvoiceTable.vue';
+import InvoiceDataTable from '@modules/Invoice/resources/js/Components/InvoiceDataTable.vue';
 import InvoiceDrawerForm from '@modules/Invoice/resources/js/Components/InvoiceDrawerForm.vue';
 import InvoiceEditDrawerForm from '@modules/Invoice/resources/js/Components/InvoiceEditDrawerForm.vue';
 
 interface Stats {
     totalRevenue: number;
+    paidRevenue: number;
     outstandingAmount: number;
     outstandingCount: number;
     invoiceCount: number;
@@ -33,6 +34,16 @@ interface ClientFolder {
     address?: string | null;
     notes?: string | null;
     invoiceCount: number;
+}
+
+interface SenderProfile {
+    id: number;
+    name: string;
+    email?: string | null;
+    phone?: string | null;
+    address?: string | null;
+    notes?: string | null;
+    isDefault?: boolean;
 }
 
 interface Client {
@@ -63,6 +74,7 @@ interface InvoiceRow {
 interface InvoiceFull {
     id: number;
     invoice_client_id?: number | null;
+    invoice_sender_id?: number | null;
     invoice_number: string;
     status: string;
     issue_date?: string | null;
@@ -73,13 +85,16 @@ interface InvoiceFull {
     tax?: number | string;
     total?: number | string;
     client?: ClientFolder | null;
+    sender?: SenderProfile | null;
     items: InvoiceItem[];
 }
 
 interface Props {
     invoices: InvoiceRow[];
     clients: ClientFolder[];
+    senders: SenderProfile[];
     stats: Stats;
+    nextInvoiceNumber: string;
 }
 
 const props = defineProps<Props>();
@@ -163,12 +178,24 @@ const formatCurrency = (value: number) => {
                         Track revenue, monitor outstanding payments, and manage client folders.
                     </p>
                 </div>
-                <InvoiceDrawerForm :clients="props.clients" />
+                <div class="flex items-center gap-3">
+                    <Link href="/invoices/clients"
+                        class="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-black hover:border-black/30">
+                        Manage clients
+                    </Link>
+                    <Link href="/invoices/senders"
+                        class="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-black hover:border-black/30">
+                        Manage senders
+                    </Link>
+                    <InvoiceDrawerForm :clients="props.clients" :senders="props.senders"
+                        :next-invoice-number="props.nextInvoiceNumber" />
+                </div>
             </div>
 
-            <div class="grid gap-4 md:grid-cols-4">
+            <div class="grid gap-4 md:grid-cols-5">
                 <StatsCard label="Total revenue" :value="formatCurrency(props.stats.totalRevenue)"
                     hint="All invoices" />
+                <StatsCard label="Paid" :value="formatCurrency(props.stats.paidRevenue)" hint="Received" />
                 <StatsCard label="Outstanding" :value="formatCurrency(props.stats.outstandingAmount)"
                     :hint="`${props.stats.outstandingCount} unpaid`" />
                 <StatsCard label="Invoices" :value="props.stats.invoiceCount" hint="Total created" />
@@ -211,13 +238,13 @@ const formatCurrency = (value: number) => {
                         </div>
                         <span class="text-sm text-black/50">{{ filteredInvoices.length }} invoice(s)</span>
                     </div>
-                    <InvoiceTable :invoices="filteredInvoices" :format-currency="formatCurrency"
+                    <InvoiceDataTable :invoices="filteredInvoices" :format-currency="formatCurrency"
                         @edit="handleEditInvoice" @delete="handleDeleteInvoice" />
                 </div>
             </div>
         </div>
         <InvoiceEditDrawerForm v-if="editingInvoice" :is-open="editDrawerOpen" :invoice="editingInvoice"
-            :clients="props.clients" @update:open="(open) => editDrawerOpen = open" />
+            :clients="props.clients" :senders="props.senders" @update:open="(open) => editDrawerOpen = open" />
         <AlertDialog v-model:open="deleteDialogOpen">
             <AlertDialogContent>
                 <AlertDialogHeader>

@@ -176,6 +176,14 @@
         display: none !important;
     }
 
+    .invoice-card {
+        border: none !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+    }
+
     body {
         background: #fff !important;
     }

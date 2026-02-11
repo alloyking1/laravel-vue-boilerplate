@@ -12,7 +12,7 @@ defineProps<Props>();
 </script>
 
 <template>
-    <div class="rounded-2xl border border-black/10 bg-white p-6">
+    <div class="invoice-card rounded-2xl border border-black/10 bg-white p-6">
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-widest text-black/40">Invoice</p>

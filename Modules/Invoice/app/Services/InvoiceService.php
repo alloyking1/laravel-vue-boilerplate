@@ -8,6 +8,10 @@ use Modules\Invoice\Models\InvoiceItem;
 
 class InvoiceService
 {
+    public function nextInvoiceNumber(): string
+    {
+        return $this->generateInvoiceNumber();
+    }
     public function create(array $data): Invoice
     {
         return Invoice::create($data);

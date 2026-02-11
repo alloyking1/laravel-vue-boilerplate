@@ -10,7 +10,7 @@ defineProps<Props>();
 </script>
 
 <template>
-    <div class="rounded-2xl border border-black/10 bg-white p-6">
+    <div class="invoice-card rounded-2xl border border-black/10 bg-white p-6">
         <p class="text-xs font-semibold uppercase tracking-widest text-black/40">Summary</p>
         <div class="mt-4 space-y-3 text-sm">
             <div class="flex items-center justify-between text-black/60">
