@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, h, ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import {
     FlexRender,
@@ -94,59 +94,61 @@ const columnHelper = createColumnHelper<InvoiceRow>();
 const columns = [
     columnHelper.accessor('invoiceNumber', {
         header: () => 'Invoice',
-        cell: ({ row }) => (
-            <div class= "space-y-2" >
-            <Link href={`/invoices/${row.original.id}`} class="font-medium hover:text-black/70 transition" >
-                { row.original.invoiceNumber }
-                </Link>
-                < StatusPill status = { row.original.status } />
-                    </div>
-        ),
+        cell: ({ row }) =>
+            h('div', { class: 'space-y-2' }, [
+                h(
+                    Link,
+                    { href: `/invoices/${row.original.id}`, class: 'font-medium hover:text-black/70 transition' },
+                    { default: () => row.original.invoiceNumber },
+                ),
+                h(StatusPill, { status: row.original.status }),
+            ]),
     }),
-columnHelper.accessor('client', {
-    header: () => 'Client',
-    cell: ({ row }) => (
-        <div>
-        <p class= "font-medium" >
-        { row.original.client?.name ?? 'Unknown' }
-        </p>
-        < p class= "text-xs text-black/50" > { row.original.client?.email ?? '—' } </p>
-            </div>
-        ),
+    columnHelper.accessor('client', {
+        header: () => 'Client',
+        cell: ({ row }) =>
+            h('div', {}, [
+                h('p', { class: 'font-medium' }, row.original.client?.name ?? 'Unknown'),
+                h('p', { class: 'text-xs text-black/50' }, row.original.client?.email ?? '—'),
+            ]),
     }),
-columnHelper.accessor('issueDate', {
-    header: () => 'Issue date',
-    cell: ({ row }) => row.original.issueDate ?? '—',
-}),
+    columnHelper.accessor('issueDate', {
+        header: () => 'Issue date',
+        cell: ({ row }) => row.original.issueDate ?? '—',
+    }),
     columnHelper.accessor('dueDate', {
         header: () => 'Due date',
         cell: ({ row }) => row.original.dueDate ?? '—',
     }),
     columnHelper.accessor('total', {
         header: () => 'Total',
-        cell: ({ row }) => (
-            <span class= "font-semibold" > { props.formatCurrency(row.original.total) } </span>
-        ),
+        cell: ({ row }) => h('span', { class: 'font-semibold' }, props.formatCurrency(row.original.total)),
     }),
-columnHelper.display({
-    id: 'actions',
-    header: () => <span class="text-right"> Action </span>,
-        cell: ({ row }) => (
-        <div class= "flex items-center justify-end gap-3" >
-        <button
-                    onClick={() => emit('edit', row.original.id)}
-    class= "text-xs font-semibold text-black/60 hover:text-black transition"
-    >
-    Edit
-    </button>
-    < button
-                    onClick = {() => emit('delete', row.original.id)}
-    class= "text-xs font-semibold text-red-500/80 hover:text-red-600 transition"
-    >
-    Delete
-    </button>
-    </div>
-),
+    columnHelper.display({
+        id: 'actions',
+        header: () => 'Action',
+        enableSorting: false,
+        cell: ({ row }) =>
+            h('div', { class: 'flex items-center justify-end gap-3' }, [
+                h(
+                    'button',
+                    {
+                        type: 'button',
+                        class: 'text-xs font-semibold text-black/60 hover:text-black transition',
+                        onClick: () => emit('edit', row.original.id),
+                    },
+                    'Edit',
+                ),
+                h(
+                    'button',
+                    {
+                        type: 'button',
+                        class: 'text-xs font-semibold text-red-500/80 hover:text-red-600 transition',
+                        onClick: () => emit('delete', row.original.id),
+                    },
+                    'Delete',
+                ),
+            ]),
     }),
 ];
 
