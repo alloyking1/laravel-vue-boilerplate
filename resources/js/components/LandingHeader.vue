@@ -15,11 +15,11 @@ const appName = page.props.name as string;
             <span class="text-lg font-semibold tracking-tight">{{ appName }}</span>
         </div>
         <div class="flex items-center gap-3">
-            <Link :href="login().url" class="text-sm font-medium text-black/70 hover:text-black">Login</Link>
+            <!-- <Link :href="login().url" class="text-sm font-medium text-black/70 hover:text-black">Login</Link>
             <Link :href="register().url"
                 class="rounded-full border border-black bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/90">
                 Get started
-            </Link>
+            </Link> -->
         </div>
     </header>
 </template>

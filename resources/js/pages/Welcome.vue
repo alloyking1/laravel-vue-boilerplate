@@ -42,7 +42,8 @@ const appName = page.props.name as string;
                                 complexity.
                             </p>
                             <div class="flex flex-wrap gap-4 pt-4">
-                                <Link :href="register().url"
+                                <!-- <Link :href="register().url" -->
+                                <Link href=""
                                     class="group relative overflow-hidden rounded-full border border-black bg-black px-8 py-4 text-sm font-semibold text-white transition-all hover:scale-105">
                                     <span class="relative z-10">Start free</span>
                                     <div
