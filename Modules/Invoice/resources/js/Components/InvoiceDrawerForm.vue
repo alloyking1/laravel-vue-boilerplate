@@ -24,23 +24,46 @@ interface ClientFolder {
     invoiceCount: number;
 }
 
+interface SenderProfile {
+    id: number;
+    name: string;
+    email?: string | null;
+    phone?: string | null;
+    address?: string | null;
+    notes?: string | null;
+    isDefault?: boolean;
+}
+
 interface Props {
     clients: ClientFolder[];
+    senders: SenderProfile[];
+    nextInvoiceNumber: string;
 }
 
 const props = defineProps<Props>();
 const page = usePage();
 const isOpen = ref(false);
 const showClientForm = ref(false);
+const showSenderForm = ref(false);
+const issueDateRef = ref<HTMLInputElement | null>(null);
+const dueDateRef = ref<HTMLInputElement | null>(null);
+const defaultSenderId =
+    props.senders.find((sender) => sender.isDefault)?.id ?? (props.senders[0]?.id ?? 'new');
 
 const form = useForm({
     invoice_client_id: '' as number | string,
+    invoice_sender_id: defaultSenderId as number | string,
     client_name: '',
     client_email: '',
     client_phone: '',
     client_address: '',
     client_notes: '',
-    invoice_number: '',
+    sender_name: '',
+    sender_email: '',
+    sender_phone: '',
+    sender_address: '',
+    sender_notes: '',
+    invoice_number: props.nextInvoiceNumber ?? '',
     issue_date: '',
     due_date: '',
     status: 'draft',
@@ -81,6 +104,11 @@ const selectedClient = computed(() => {
     return props.clients.find((client) => client.id === Number(form.invoice_client_id)) ?? null;
 });
 
+const selectedSender = computed(() => {
+    if (!form.invoice_sender_id) return null;
+    return props.senders.find((sender) => sender.id === Number(form.invoice_sender_id)) ?? null;
+});
+
 watch(
     () => form.invoice_client_id,
     (value) => {
@@ -108,6 +136,42 @@ watch(
         form.client_email = client.email ?? '';
         form.client_address = client.address ?? '';
     },
+);
+
+watch(
+    () => form.invoice_sender_id,
+    (value) => {
+        if (value === 'new') {
+            showSenderForm.value = true;
+            form.sender_name = '';
+            form.sender_email = '';
+            form.sender_phone = '';
+            form.sender_address = '';
+            form.sender_notes = '';
+            return;
+        }
+
+        if (!value) {
+            showSenderForm.value = false;
+            form.sender_name = '';
+            form.sender_email = '';
+            form.sender_phone = '';
+            form.sender_address = '';
+            form.sender_notes = '';
+            return;
+        }
+
+        showSenderForm.value = false;
+        const sender = selectedSender.value;
+        if (!sender) return;
+
+        form.sender_name = sender.name ?? '';
+        form.sender_email = sender.email ?? '';
+        form.sender_phone = sender.phone ?? '';
+        form.sender_address = sender.address ?? '';
+        form.sender_notes = sender.notes ?? '';
+    },
+    { immediate: true },
 );
 
 const removeItem = (index: number) => {
@@ -144,6 +208,18 @@ const resetForm = () => {
     form.status = 'draft';
     form.currency = 'USD';
     showClientForm.value = false;
+    showSenderForm.value = false;
+    form.invoice_sender_id = defaultSenderId as number | string;
+    form.invoice_number = props.nextInvoiceNumber ?? '';
+};
+
+const openDatePicker = (input: HTMLInputElement | null) => {
+    if (!input) return;
+    if (typeof input.showPicker === 'function') {
+        input.showPicker();
+        return;
+    }
+    input.focus();
 };
 </script>
 
@@ -215,14 +291,74 @@ const resetForm = () => {
                         </div>
                     </div>
 
+                    <div class="space-y-3">
+                        <p class="text-xs font-semibold uppercase tracking-widest text-black/40">Sender profile</p>
+                        <select v-model="form.invoice_sender_id"
+                            class="w-full rounded-xl border border-black/10 px-3 py-2 text-sm">
+                            <option value="">Select sender</option>
+                            <option value="new">+ Create new sender</option>
+                            <option v-for="sender in props.senders" :key="sender.id" :value="sender.id">
+                                {{ sender.name }}
+                            </option>
+                        </select>
+                        <InputError :message="form.errors.invoice_sender_id" />
+                    </div>
+
+                    <div v-if="showSenderForm || selectedSender"
+                        class="space-y-4 rounded-xl border border-black/10 bg-black/[0.02] p-4">
+                        <p class="text-xs font-semibold uppercase tracking-widest text-black/40">
+                            {{ showSenderForm ? 'New sender details' : 'Sender information' }}
+                        </p>
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div>
+                                <label class="text-xs font-semibold uppercase tracking-widest text-black/40">Company
+                                    name</label>
+                                <input v-model="form.sender_name" type="text" :disabled="!showSenderForm"
+                                    class="mt-2 w-full rounded-xl border border-black/10 px-3 py-2 text-sm disabled:bg-black/5 disabled:text-black/50"
+                                    placeholder="Your Company" />
+                                <InputError :message="form.errors.sender_name" />
+                            </div>
+                            <div>
+                                <label
+                                    class="text-xs font-semibold uppercase tracking-widest text-black/40">Email</label>
+                                <input v-model="form.sender_email" type="email" :disabled="!showSenderForm"
+                                    class="mt-2 w-full rounded-xl border border-black/10 px-3 py-2 text-sm disabled:bg-black/5 disabled:text-black/50"
+                                    placeholder="billing@company.com" />
+                                <InputError :message="form.errors.sender_email" />
+                            </div>
+                            <div>
+                                <label
+                                    class="text-xs font-semibold uppercase tracking-widest text-black/40">Phone</label>
+                                <input v-model="form.sender_phone" type="text" :disabled="!showSenderForm"
+                                    class="mt-2 w-full rounded-xl border border-black/10 px-3 py-2 text-sm disabled:bg-black/5 disabled:text-black/50"
+                                    placeholder="+1 (555) 123-4567" />
+                                <InputError :message="form.errors.sender_phone" />
+                            </div>
+                            <div>
+                                <label
+                                    class="text-xs font-semibold uppercase tracking-widest text-black/40">Address</label>
+                                <textarea v-model="form.sender_address" rows="2" :disabled="!showSenderForm"
+                                    class="mt-2 w-full rounded-xl border border-black/10 px-3 py-2 text-sm disabled:bg-black/5 disabled:text-black/50"
+                                    placeholder="Company address" />
+                                <InputError :message="form.errors.sender_address" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold uppercase tracking-widest text-black/40">Notes</label>
+                            <textarea v-model="form.sender_notes" rows="2" :disabled="!showSenderForm"
+                                class="mt-2 w-full rounded-xl border border-black/10 px-3 py-2 text-sm disabled:bg-black/5 disabled:text-black/50"
+                                placeholder="Extra details (optional)" />
+                            <InputError :message="form.errors.sender_notes" />
+                        </div>
+                    </div>
+
                     <div class="grid gap-4 md:grid-cols-2">
                         <div>
                             <label class="text-xs font-semibold uppercase tracking-widest text-black/40">Invoice
                                 number</label>
-                            <input v-model="form.invoice_number" type="text"
-                                class="mt-2 w-full rounded-xl border border-black/10 px-3 py-2 text-sm"
-                                placeholder="INV-0001" />
-                            <InputError :message="form.errors.invoice_number" />
+                            <input v-model="form.invoice_number" type="text" disabled
+                                class="mt-2 w-full rounded-xl border border-black/10 bg-black/5 px-3 py-2 text-sm text-black/60"
+                                placeholder="Auto-generated on save" />
                         </div>
                         <div>
                             <label class="text-xs font-semibold uppercase tracking-widest text-black/40">Status</label>
@@ -238,14 +374,16 @@ const resetForm = () => {
                         <div>
                             <label class="text-xs font-semibold uppercase tracking-widest text-black/40">Issue
                                 date</label>
-                            <input v-model="form.issue_date" type="date"
+                            <input ref="issueDateRef" v-model="form.issue_date" type="date"
+                                @click="openDatePicker(issueDateRef)"
                                 class="mt-2 w-full rounded-xl border border-black/10 px-3 py-2 text-sm" />
                             <InputError :message="form.errors.issue_date" />
                         </div>
                         <div>
                             <label class="text-xs font-semibold uppercase tracking-widest text-black/40">Due
                                 date</label>
-                            <input v-model="form.due_date" type="date"
+                            <input ref="dueDateRef" v-model="form.due_date" type="date"
+                                @click="openDatePicker(dueDateRef)"
                                 class="mt-2 w-full rounded-xl border border-black/10 px-3 py-2 text-sm" />
                             <InputError :message="form.errors.due_date" />
                         </div>

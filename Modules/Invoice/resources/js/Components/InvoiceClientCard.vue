@@ -15,7 +15,7 @@ defineProps<Props>();
 </script>
 
 <template>
-    <div class="rounded-2xl border border-black/10 bg-white p-6">
+    <div class="invoice-card rounded-2xl border border-black/10 bg-white p-6">
         <p class="text-xs font-semibold uppercase tracking-widest text-black/40">Billed to</p>
         <div v-if="client" class="mt-4 space-y-2">
             <p class="text-lg font-semibold text-black">{{ client.name }}</p>

@@ -12,6 +12,7 @@ use Modules\Invoice\Http\Requests\UpdateInvoiceRequest;
 use Inertia\Response;
 use Modules\Invoice\Models\Invoice;
 use Modules\Invoice\Services\InvoiceClientService;
+use Modules\Invoice\Services\InvoiceSenderService;
 use Modules\Invoice\Services\InvoiceService;
 
 class InvoiceController extends Controller
@@ -21,7 +22,7 @@ class InvoiceController extends Controller
         abort_unless($request->user()?->id === $invoice->user_id, 403);
 
         return Inertia::render('invoice/Show', [
-            'invoice' => $invoice->load(['client', 'items', 'user']),
+            'invoice' => $invoice->load(['client', 'sender', 'items', 'user']),
         ]);
     }
 
@@ -30,7 +31,7 @@ class InvoiceController extends Controller
         abort_unless($request->user()?->id === $invoice->user_id, 403);
 
         return response()->json([
-            'invoice' => $invoice->load(['client', 'items'])->toArray(),
+            'invoice' => $invoice->load(['client', 'sender', 'items'])->toArray(),
         ]);
     }
 
@@ -63,7 +64,8 @@ class InvoiceController extends Controller
         UpdateInvoiceRequest $request,
         Invoice $invoice,
         InvoiceService $invoiceService,
-        InvoiceClientService $clientService
+        InvoiceClientService $clientService,
+        InvoiceSenderService $senderService
     ): RedirectResponse {
         abort_unless($request->user()?->id === $invoice->user_id, 403);
 
@@ -82,8 +84,23 @@ class InvoiceController extends Controller
             $clientId = $client->id;
         }
 
+        $senderId = $payload['invoice_sender_id'] ?? null;
+        if (! $senderId || $senderId === 'new') {
+            $sender = $senderService->create([
+                'user_id' => $request->user()->id,
+                'name' => $payload['sender_name'],
+                'email' => $payload['sender_email'] ?? null,
+                'phone' => $payload['sender_phone'] ?? null,
+                'address' => $payload['sender_address'] ?? null,
+                'notes' => $payload['sender_notes'] ?? null,
+            ]);
+
+            $senderId = $sender->id;
+        }
+
         $invoiceService->updateWithItems($invoice, [
             'invoice_client_id' => $clientId,
+            'invoice_sender_id' => $senderId,
             'invoice_number' => $payload['invoice_number'] ?? $invoice->invoice_number,
             'status' => $payload['status'] ?? $invoice->status,
             'issue_date' => $payload['issue_date'] ?? null,
@@ -102,12 +119,13 @@ class InvoiceController extends Controller
     public function store(
         StoreInvoiceRequest $request,
         InvoiceService $invoiceService,
-        InvoiceClientService $clientService
+        InvoiceClientService $clientService,
+        InvoiceSenderService $senderService
     ): RedirectResponse {
         $payload = $request->validated();
 
         $clientId = $payload['invoice_client_id'] ?? null;
-        if (! $clientId) {
+        if (! $clientId || $clientId === 'new') {
             $client = $clientService->create([
                 'name' => $payload['client_name'],
                 'email' => $payload['client_email'] ?? null,
@@ -119,9 +137,24 @@ class InvoiceController extends Controller
             $clientId = $client->id;
         }
 
+        $senderId = $payload['invoice_sender_id'] ?? null;
+        if (! $senderId || $senderId === 'new') {
+            $sender = $senderService->create([
+                'user_id' => $request->user()->id,
+                'name' => $payload['sender_name'],
+                'email' => $payload['sender_email'] ?? null,
+                'phone' => $payload['sender_phone'] ?? null,
+                'address' => $payload['sender_address'] ?? null,
+                'notes' => $payload['sender_notes'] ?? null,
+            ]);
+
+            $senderId = $sender->id;
+        }
+
         $invoiceService->createWithItems([
             'user_id' => $request->user()->id,
             'invoice_client_id' => $clientId,
+            'invoice_sender_id' => $senderId,
             'invoice_number' => $payload['invoice_number'] ?? null,
             'status' => $payload['status'] ?? 'draft',
             'issue_date' => $payload['issue_date'] ?? null,

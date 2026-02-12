@@ -24,7 +24,7 @@ const getAmount = (item: InvoiceItem) => {
 </script>
 
 <template>
-    <div class="overflow-hidden rounded-2xl border border-black/10 bg-white">
+    <div class="invoice-card overflow-hidden rounded-2xl border border-black/10 bg-white">
         <div
             class="grid grid-cols-4 gap-4 border-b border-black/10 px-6 py-4 text-xs font-semibold uppercase tracking-widest text-black/50">
             <span>Description</span>

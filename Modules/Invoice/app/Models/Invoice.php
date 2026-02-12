@@ -32,6 +32,11 @@ class Invoice extends Model
         return $this->belongsTo(InvoiceClient::class, 'invoice_client_id');
     }
 
+    public function sender()
+    {
+        return $this->belongsTo(InvoiceSender::class, 'invoice_sender_id');
+    }
+
     public function items()
     {
         return $this->hasMany(InvoiceItem::class);
