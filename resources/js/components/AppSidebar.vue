@@ -8,7 +8,7 @@ import TeamController from "@/actions/App/Http/Controllers/TeamController";
 import BusinessController from '@/actions/App/Http/Controllers/BusinessController';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Users, BriefcaseBusiness, Building2, ShieldHalf, FileText } from 'lucide-vue-next';
+import { BookOpen, Folder, LayoutGrid, Users, BriefcaseBusiness, Building2, ShieldHalf, FileText, CreditCard } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
@@ -59,9 +59,9 @@ const footerNavItems: NavItem[] = [
         icon: Folder,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
+        title: 'Payment',
+        href: '/payments',
+        icon: CreditCard,
     },
 ];
 
