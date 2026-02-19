@@ -26,10 +26,17 @@ class PaymentController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): Response
     {
-        return view('payment::create', [
-            'test' => config('payment.test'),
+        return Inertia::render('payment/PricingPlans', [
+            'priceIds' => [
+                'individual_monthly' => env('PADDLE_INDIVIDUAL_MONTHLY'),
+                'individual_yearly' => env('PADDLE_INDIVIDUAL_YEARLY'),
+                'business_monthly' => env('PADDLE_BUSINESS_MONTHLY'),
+                'business_yearly' => env('PADDLE_BUSINESS_YEARLY'),
+            ],
+            'paddle_client_token' => env('PADDLE_CLIENT_SIDE_TOKEN'),
+            'paddle_sandbox' => config('cashier.sandbox', true),
         ]);
     }
 
