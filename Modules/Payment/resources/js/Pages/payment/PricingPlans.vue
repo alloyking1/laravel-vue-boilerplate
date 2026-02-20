@@ -275,15 +275,15 @@ onMounted(() => {
     if (window.Paddle) {
         const token = page.props.paddle_client_token as string
         const isSandbox = page.props.paddle_sandbox as boolean
-        
+
         // Set environment before initializing
         if (isSandbox) {
             window.Paddle.Environment.set('sandbox')
         }
-        
+
         window.Paddle.Initialize({
             token: token,
-            eventCallback: function(event: any) {
+            eventCallback: function (event: any) {
                 if (event.name === 'checkout.completed') {
                     // Redirect to success page
                     router.visit('/payments/checkout/success')
@@ -312,7 +312,7 @@ const selectPlan = (planName: string, priceId: string) => {
     processing.value = true
 
     const user = page.props.auth?.user as any
-    
+
     // Open Paddle checkout
     window.Paddle.Checkout.open({
         items: [
