@@ -45,11 +45,14 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
+                'subscribed' => $request->user()?->subscribed() ?? false,
+                'on_trial' => $request->user()?->onTrial() ?? false,
             ],
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => session()->get('error'),
                 'warning' => session()->get('warning'),
+                'message' => session()->get('message'),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

@@ -2,9 +2,11 @@
 
 namespace Modules\Payment\Providers;
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Modules\Payment\Contracts\PaymentGatewayInterface;
+use Modules\Payment\Http\Middleware\EnsureUserHasSubscription;
 use Modules\Payment\Services\PaddleGateway;
 use Modules\Payment\Services\StripeGateway;
 use Nwidart\Modules\Traits\PathNamespace;
@@ -30,6 +32,7 @@ class PaymentServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->registerMiddleware();
     }
 
     /**
@@ -142,6 +145,15 @@ class PaymentServiceProvider extends ServiceProvider
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->nameLower);
 
         Blade::componentNamespace(config('modules.namespace').'\\' . $this->name . '\\View\\Components', $this->nameLower);
+    }
+
+    /**
+     * Register module middleware globally.
+     */
+    protected function registerMiddleware(): void
+    {
+        $router = $this->app->make(Router::class);
+        $router->aliasMiddleware('subscribed', EnsureUserHasSubscription::class);
     }
 
     /**

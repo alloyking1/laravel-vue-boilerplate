@@ -39,6 +39,13 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
+        {{-- Paddle.js --}}
+        @if(config('cashier.sandbox'))
+        <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+        @else
+        <script src="https://cdn.paddle.com/paddle/paddle.js"></script>
+        @endif
+
         @vite(['resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
         @inertiaHead
     </head>

@@ -13,7 +13,7 @@ Route::post('/coming-soon', [ComingSoonController::class, 'store'])->name('comin
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified', 'subscribed'])->name('dashboard');
 
 
 require __DIR__.'/settings.php';
