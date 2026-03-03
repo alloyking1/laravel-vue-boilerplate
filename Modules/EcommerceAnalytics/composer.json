@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/ecommerceanalytics",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\EcommerceAnalytics\\": "app/",
+            "Modules\\EcommerceAnalytics\\Database\\Factories\\": "database/factories/",
+            "Modules\\EcommerceAnalytics\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\EcommerceAnalytics\\Tests\\": "tests/"
+        }
+    }
+}
