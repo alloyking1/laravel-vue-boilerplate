@@ -39,7 +39,8 @@ class ShopifyController extends Controller
 
         $shop = $request->input('shop');
         $scopes = 'read_orders,read_products';
-        $redirectUri = route('ecommerceanalytics.shopify.callback');
+        $redirectUri = env('SHOPIFY_REDIRECT_URI')
+            ?: route('ecommerceanalytics.shopify.callback');
 
         $url = "https://{$shop}/admin/oauth/authorize?" . http_build_query([
             'client_id' => env('SHOPIFY_CLIENT_ID'),
