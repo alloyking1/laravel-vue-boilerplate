@@ -59,4 +59,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Business::class);
     }
+
+    public function connectedStores()
+    {
+        return $this->hasMany(\Modules\EcommerceAnalytics\Models\ConnectedStore::class);
+    }
 }

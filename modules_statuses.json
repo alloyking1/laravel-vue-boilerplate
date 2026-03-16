@@ -1,5 +1,6 @@
 {
     "Blog": true,
     "Invoice": true,
-    "Payment": true
+    "Payment": true,
+    "EcommerceAnalytics": true
 }

@@ -26,9 +26,9 @@ class SetContentSecurityPolicy
         // More restrictive CSP with specific Paddle domains
         $csp = [
             "default-src 'self'{$viteServer}",
-            "frame-src 'self' https://*.paddle.com https://{$paddleDomain}",
+            "frame-src 'self' https://*.paddle.com https://{$paddleDomain} https://*.myshopify.com",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://{$paddleCdn} https://cdn.jsdelivr.net https://public.profitwell.com{$viteServer}",
-            "connect-src 'self' https://*.paddle.com https://{$paddleDomain} https://checkout-service.paddle.com{$viteWs}{$viteServer}",
+            "connect-src 'self' https://*.paddle.com https://{$paddleDomain} https://checkout-service.paddle.com https://*.myshopify.com{$viteWs}{$viteServer}",
             "img-src 'self' data: https://*.paddle.com",
             "style-src 'self' 'unsafe-inline' https://{$paddleCdn} https://fonts.bunny.net{$viteServer}",
             "font-src 'self' https://fonts.bunny.net",
